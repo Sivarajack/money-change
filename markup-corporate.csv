@@ -1,0 +1,4 @@
+StartLimit,EndLimit,MarkUp
+0,1000000,15
+1000000,3000000,10
+3000000,infinity,5

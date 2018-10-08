@@ -1,0 +1,6 @@
+BaseCurrency,WantedCurrency,AmountInBaseCurrency,StandardRate,FinalRate,ProfitInWantedCurrency,ProfitInSGD
+CNY,SGD,40000,0.2012,32.0,32.0
+AUD,SGD,3500000,1.1704,2100.08,2100.08
+SGD,AUD,3500,0.8501,11.9,13.93
+EUR,USD,7480,1.4025,36.65,46.06
+SGD,CNY,12500,4.8895,213.75,43.03

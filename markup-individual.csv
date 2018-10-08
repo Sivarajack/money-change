@@ -1,0 +1,5 @@
+StartLimit,EndLimit,MarkUp
+0,8000,40
+8000,20000,35
+20000,35000,30
+35000,infinity,25

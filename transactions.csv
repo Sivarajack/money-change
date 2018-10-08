@@ -1,0 +1,6 @@
+BaseCurrency,WantedCurrency,AmountInBaseCurrency,ClientType,TransactionTime
+CNY,SGD,40000,Individual,08:32
+AUD,SGD,3500000,Corporate,09:43
+SGD,AUD,3500,Individual,09:55
+EUR,USD,7480,Individual,10:13
+SGD,CNY,12500,Individual,10:24
