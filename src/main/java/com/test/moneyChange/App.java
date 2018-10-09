@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.test.moneyChange.constants.Constants;
+import com.test.moneyChange.exception.BusinessException;
+import com.test.moneyChange.exception.SystemException;
 import com.test.moneyChange.model.ClientType;
 import com.test.moneyChange.model.Currency;
 import com.test.moneyChange.model.MarkUp;
@@ -23,14 +25,16 @@ import com.test.moneyChange.service.MoneyChangeImpl;
 import com.test.moneyChange.service.MoneyChnageInterface;
 import com.test.moneyChange.service.MoneyChnageService;
 
-/**
- * Hello world!
- *
- */
+
 public class App {
 	public static void main(String[] args) {
 		MoneyChnageService service = new MoneyChnageService(new MoneyChangeImpl());
-		service.generateMoneyChangeReport();
+		try {
+			service.generateMoneyChangeReport();
+		} catch (SystemException e) {
+			System.out.println(e.getMessage());
+			System.out.println("Report Generation Failed");
+		} 
 	}
 
 }

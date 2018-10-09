@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.test.moneyChange.constants.Constants;
+import com.test.moneyChange.exception.BusinessException;
+import com.test.moneyChange.exception.SystemException;
 import com.test.moneyChange.model.ClientType;
 import com.test.moneyChange.model.Currency;
 import com.test.moneyChange.model.MarkUp;
@@ -24,13 +26,12 @@ public class MoneyChnageService {
 		super();
 		this.moneyChange = moneyChange;
 	}
-	public void generateMoneyChangeReport() {
+	public void generateMoneyChangeReport() throws SystemException {
 		File transactionFile = new File(Constants.TRANSACTION_FILE);
 		File rateFile = new File(Constants.RATES_FILE);
 		File corprateMarkupFile = new File(Constants.MARKUP_CORPORATE);
 		File individualMarkupFile = new File(Constants.MARKUP_INDIVIDUAL);
 		File rateLocation = new File(Constants.RATES_FILE);
-		//MoneyChnageInterface moneyChange = new MoneyChangemoneyChange();
 					StringBuilder sb = new StringBuilder();
 			sb.append(
 					"BaseCurrency,WantedCurrency,AmountInBaseCurrency,StandardRate,FinalRate,ProfitInWantedCurrency,ProfitInSGD"
@@ -39,11 +40,14 @@ public class MoneyChnageService {
 			Map<MarkUp, Integer> corporateMarkUpMap = new HashMap<MarkUp, Integer>();
 			Map<MarkUp, Integer> individualMarkUpMap = new HashMap<MarkUp, Integer>();
 			Map<LocalTime, List<Rates>> rateMap = new TreeMap<LocalTime, List<Rates>>();
+			
 			moneyChange.createTransactionList(transactionList, transactionFile);
+			
 			moneyChange.createMarkupMap(corporateMarkUpMap, corprateMarkupFile);
 			moneyChange.createMarkupMap(individualMarkUpMap, individualMarkupFile);
 			moneyChange.createRateMap(rateMap, rateLocation);
 			for (Transaction trn : transactionList) {
+				try {
 				double markUp = 0;
 				float rate;
 				float USDRate = 0;
@@ -76,8 +80,16 @@ public class MoneyChnageService {
 				}
 				sb.append(trn.getBaseCurrency().toString() + ',' + trn.getWantedCurrency().toString() + ','
 						+ trn.getAmountInBaseCurrency() + ',' + rate + ',' + profit + ',' + profitInSGD + '\n');
+			}catch(BusinessException e) {
+				System.out.println(e.getMessage());
 			}
-			moneyChange.generateReport(sb.toString(), Constants.REPORT_FILE);
+				}
+			
+			try {
+				moneyChange.generateReport(sb.toString(), Constants.REPORT_FILE);
+			} catch (SystemException e) {
+				System.out.println(e.getMessage());
+			}
 			System.out.println("report Generated");
 		
 	}

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.test.moneyChange.exception.BusinessException;
+import com.test.moneyChange.exception.SystemException;
 import com.test.moneyChange.model.ClientType;
 import com.test.moneyChange.model.Currency;
 import com.test.moneyChange.model.MarkUp;
@@ -23,14 +25,14 @@ import com.test.moneyChange.model.Transaction;
 
 public class MoneyChangeImpl implements MoneyChnageInterface {
 
-	public List<Transaction> createTransactionList(List<Transaction> objectList, File fileLocation) {
+	public List<Transaction> createTransactionList(List<Transaction> objectList, File fileLocation) throws SystemException {
 		try {
 			BufferedReader brBufferedReader = new BufferedReader(new FileReader((fileLocation)));
 			String line;
 			try {
 				String headerLine = brBufferedReader.readLine();
 				while ((line = brBufferedReader.readLine()) != null) {
-
+					try {
 					String[] txnArray = line.split(",");
 					Transaction transactionObject = new Transaction();
 					transactionObject.setBaseCurrency(Currency.valueOf(txnArray[0]));
@@ -39,20 +41,24 @@ public class MoneyChangeImpl implements MoneyChnageInterface {
 					transactionObject.setClientType(ClientType.valueOf(txnArray[3]));
 					transactionObject.setTransactionTime(LocalTime.parse(txnArray[4]));
 					objectList.add(transactionObject);
+					}catch(ArrayIndexOutOfBoundsException e) {
+						System.out.println(e.getMessage());
+					}catch(IllegalArgumentException e) {
+						System.out.println(e.getMessage());
+					}
 
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new SystemException("Unable to line from reader");
 			}
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SystemException("Unable to read file");
 		}
 		return objectList;
 	}
 
-	public void generateReport(String reportString, String reportLocation) {
+	public void generateReport(String reportString, String reportLocation) throws SystemException {
 		PrintWriter printWriter;
 		try {
 			printWriter = new PrintWriter(new FileWriter(reportLocation));
@@ -60,7 +66,7 @@ public class MoneyChangeImpl implements MoneyChnageInterface {
 			printWriter.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SystemException("Unable to write Report file");
 		}
 	}
 
@@ -78,7 +84,7 @@ public class MoneyChangeImpl implements MoneyChnageInterface {
 		return markUp;
 	}
 
-	public Map<MarkUp, Integer> createMarkupMap(Map<MarkUp, Integer> markupMap, File fileLocation) {
+	public Map<MarkUp, Integer> createMarkupMap(Map<MarkUp, Integer> markupMap, File fileLocation) throws SystemException {
 		try {
 			BufferedReader brBufferedReader = new BufferedReader(new FileReader((fileLocation)));
 			String line;
@@ -93,17 +99,15 @@ public class MoneyChangeImpl implements MoneyChnageInterface {
 					markupMap.put(markUpObject, Integer.parseInt(mrkArray[2]));
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new SystemException("Unable to line from reader");
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SystemException("Unable to read file");
 		}
 		return markupMap;
 	}
 
-	public Map<LocalTime, List<Rates>> createRateMap(Map<LocalTime, List<Rates>> rateMap, File fileLocation) {
+	public Map<LocalTime, List<Rates>> createRateMap(Map<LocalTime, List<Rates>> rateMap, File fileLocation) throws SystemException {
 		try {
 			BufferedReader brBufferedReader = new BufferedReader(new FileReader((fileLocation)));
 			String line;
@@ -122,17 +126,15 @@ public class MoneyChangeImpl implements MoneyChnageInterface {
 					}
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new SystemException("Unable to line from reader");
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new SystemException("Unable to read file");
 		}
 		return null;
 	}
 
-	public float getRate(Map<LocalTime, List<Rates>> rateMap, Transaction transaction) {
+	public float getRate(Map<LocalTime, List<Rates>> rateMap, Transaction transaction) throws BusinessException {
 		float rate = 0;
 		Iterator itr = rateMap.keySet().iterator();
 		while (itr.hasNext()) {
@@ -149,6 +151,9 @@ public class MoneyChangeImpl implements MoneyChnageInterface {
 			if(rate!=0) {
 				break;
 			}
+		}
+		if(rate == 0) {
+			throw new BusinessException("No rate found for transaction "+transaction.toString());
 		}
 		return rate;
 	}
